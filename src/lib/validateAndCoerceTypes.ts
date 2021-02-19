@@ -7,8 +7,11 @@ const schema = require("../../schema.json");
 const pkg = require("../../package.json");
 import { InvalidOptionsError, FailedYahooValidationError } from "./errors";
 
+// https://ajv.js.org/docs/api.html#options
 export const ajv = new Ajv({
+  // All rules, all errors.  Don't end early after first error.
   allErrors: true,
+  // Allow multiple non-null types, like in TypeSript.
   allowUnionTypes: true,
 });
 addFormats(ajv);
@@ -27,17 +30,54 @@ ajv.addKeyword({
         return true;
       }
 
-      if (schema === "number") {
+      if (schema === "number" || schema === "number|null") {
         if (typeof data === "number") return true;
 
         if (typeof data === "string") {
           let float = Number.parseFloat(data);
-          if (Number.isNaN(float)) return false;
+          if (Number.isNaN(float)) {
+            validate.errors = validate.errors || [];
+            validate.errors.push({
+              keyword: "yahooFinanceType",
+              message: "Number.parseFloat returned NaN",
+              params: { schema, data },
+            });
+            return false;
+          }
           return set(float);
         }
 
+        if (data === null) {
+          if (schema === "number|null") {
+            return true;
+          } else {
+            validate.errors = validate.errors || [];
+            validate.errors.push({
+              keyword: "yahooFinanceType",
+              message: "Expecting number'ish but got null",
+              params: { schema, data },
+            });
+            return false;
+          }
+        }
+
         if (typeof data === "object") {
-          if (Object.keys(data).length === 0) return set(null);
+          if (Object.keys(data).length === 0) {
+            // Value of {} becomes null
+            // Note, TypeScript types should be "number | null"
+            if (schema === "number|null") {
+              return set(null);
+            } else {
+              validate.errors = validate.errors || [];
+              validate.errors.push({
+                keyword: "yahooFinanceType",
+                message:
+                  "Got {}->null for 'number', did you want 'number | null' ?",
+                params: { schema, data },
+              });
+              return false;
+            }
+          }
           if (typeof data.raw === "number") return set(data.raw);
         }
       } else if (schema === "date") {
@@ -76,7 +116,16 @@ ajv.addKeyword({
           return true;
         if (typeof data === "string") {
           const parts = data.split("-").map(parseFloat);
-          if (Number.isNaN(parts[0]) || Number.isNaN(parts[1])) return false;
+          if (Number.isNaN(parts[0]) || Number.isNaN(parts[1])) {
+            validate.errors = validate.errors || [];
+            validate.errors.push({
+              keyword: "yahooFinanceType",
+              message:
+                "Number.parseFloat returned NaN: [" + parts.join(",") + "]",
+              params: { schema, data },
+            });
+            return false;
+          }
           return set({ low: parts[0], high: parts[1] });
         }
       } else {
@@ -103,12 +152,19 @@ const logObj = process?.stdout?.isTTY
   ? (obj: any) => console.dir(obj, { depth: 4, colors: true })
   : (obj: any) => console.log(JSON.stringify(obj, null, 2));
 
+export function resolvePath(obj: any, dataPath: string) {
+  const path = dataPath.split("/");
+  let ref = obj;
+  for (let i = 1; i < path.length; i++) ref = ref[path[i]];
+  return ref;
+}
+
 interface ValidationOptions {
   logErrors: boolean;
   logOptionsErrors: boolean;
 }
 
-interface ValidateParams {
+export interface ValidateParams {
   source: string;
   type: "options" | "result";
   object: object;
@@ -130,13 +186,23 @@ function validate({
   if (valid) return;
 
   if (type === "result") {
+    /* istanbul ignore else */
+    if (validator.errors)
+      validator.errors.forEach((error) => {
+        // For now let's ignore the base object which could be huge.
+        /* istanbul ignore else */
+        if (error.dataPath !== "")
+          // Note, not the regular ajv data value from verbose:true
+          error.data = resolvePath(object, error.dataPath);
+      });
+
     if (options.logErrors) {
       const title = encodeURIComponent("Failed validation: " + schemaKey);
       console.log(
         "The following result did not validate with schema: " + schemaKey
       );
       logObj(validator.errors);
-      logObj(object);
+      // logObj(object);
       console.log(`
 This may happen intermittently and you should catch errors appropriately.
 However:  1) if this recently started happening on every request for a symbol

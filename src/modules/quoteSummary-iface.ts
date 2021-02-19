@@ -91,8 +91,8 @@ export interface BalanceSheetHistory {
 }
 
 export interface BalanceSheetStatement {
-  maxAge?: number;
-  endDate?: Date;
+  maxAge: number;
+  endDate: Date;
   cash?: number;
   shortTermInvestments?: number;
   netReceivables?: number;
@@ -114,13 +114,13 @@ export interface BalanceSheetStatement {
   retainedEarnings?: number;
   treasuryStock?: number;
   otherStockholderEquity?: number;
-  totalStockholderEquity: number;
-  netTangibleAssets: number;
+  totalStockholderEquity?: number;
+  netTangibleAssets?: number;
   goodWill?: number;
   intangibleAssets?: number;
   deferredLongTermAssetCharges?: number;
   deferredLongTermLiab?: number;
-  minorityInterest?: number;
+  minorityInterest?: number | null;
   capitalSurplus?: number;
 }
 
@@ -147,9 +147,9 @@ export interface CashflowStatementHistory {
 }
 
 export interface CashflowStatement {
-  maxAge?: number;
-  endDate?: Date;
-  netIncome?: number;
+  maxAge: number;
+  endDate: Date;
+  netIncome: number;
   depreciation?: number;
   changeToNetincome?: number;
   changeToAccountReceivables?: number;
@@ -229,7 +229,7 @@ export interface QuoteSummaryEarnings {
   maxAge: number;
   earningsChart: EarningsChart;
   financialsChart: FinancialsChart;
-  financialCurrency: string;
+  financialCurrency?: string;
 }
 
 export interface EarningsChart {
@@ -270,11 +270,11 @@ export interface EarningsHistory {
 
 export interface EarningsHistoryHistory {
   maxAge: number;
-  epsActual: number;
-  epsEstimate: number;
-  epsDifference: number;
-  surprisePercent: number;
-  quarter: number;
+  epsActual: number | null;
+  epsEstimate: number | null;
+  epsDifference: number | null;
+  surprisePercent: number | null;
+  quarter: number | null;
   period: string;
 }
 
@@ -287,7 +287,7 @@ export interface EarningsTrendTrend {
   maxAge: number;
   period: string;
   endDate: Date | null;
-  growth: number;
+  growth: number | null;
   earningsEstimate: EarningsEstimate;
   revenueEstimate: RevenueEstimate;
   epsTrend: EpsTrend;
@@ -295,71 +295,69 @@ export interface EarningsTrendTrend {
 }
 
 export interface EarningsEstimate {
-  avg: number;
-  low: number;
-  high: number;
-  yearAgoEps: number;
-  numberOfAnalysts: number;
-  growth: number;
+  avg: number | null;
+  low: number | null;
+  high: number | null;
+  yearAgoEps: number | null;
+  numberOfAnalysts: number | null;
+  growth: number | null;
 }
 
 export interface EpsRevisions {
-  upLast7days: number;
-  upLast30days: number;
-  downLast30days: number;
-  downLast90days: DiscontinuedOperations;
+  upLast7days: number | null;
+  upLast30days: number | null;
+  downLast30days: number | null;
+  downLast90days: number | null;
 }
 
-export interface DiscontinuedOperations {}
-
 export interface EpsTrend {
-  current: number;
-  "7daysAgo": number;
-  "30daysAgo": number;
-  "60daysAgo": number;
-  "90daysAgo": number;
+  current: number | null;
+  "7daysAgo": number | null;
+  "30daysAgo": number | null;
+  "60daysAgo": number | null;
+  "90daysAgo": number | null;
 }
 
 export interface RevenueEstimate {
-  avg: number;
-  low: number;
-  high: number;
-  numberOfAnalysts: number;
-  yearAgoRevenue: number;
-  growth: number;
+  avg: number | null;
+  low: number | null;
+  high: number | null;
+  numberOfAnalysts: number | null;
+  yearAgoRevenue: number | null;
+  growth: number | null;
 }
 
 export interface FinancialData {
   maxAge: number;
   currentPrice: number;
-  targetHighPrice: number;
-  targetLowPrice: number;
-  targetMeanPrice: number;
-  targetMedianPrice: number;
+  targetHighPrice?: number;
+  targetLowPrice?: number;
+  targetMeanPrice?: number;
+  targetMedianPrice?: number;
   recommendationMean?: number;
   recommendationKey: string;
-  numberOfAnalystOpinions: number;
+  numberOfAnalystOpinions?: number;
   totalCash?: number;
   totalCashPerShare?: number;
   ebitda?: number;
   totalDebt?: number;
-  quickRatio: number;
-  currentRatio: number;
+  quickRatio?: number;
+  currentRatio?: number;
   totalRevenue?: number;
-  debtToEquity: number;
+  debtToEquity?: number;
   revenuePerShare?: number;
-  returnOnAssets: number;
-  returnOnEquity: number;
-  grossProfits: number;
+  returnOnAssets?: number;
+  returnOnEquity?: number;
+  grossProfits?: number;
   freeCashflow?: number;
   operatingCashflow?: number;
   earningsGrowth?: number;
-  revenueGrowth: number;
-  grossMargins: number;
-  ebitdaMargins: number;
-  operatingMargins: number;
-  profitMargins: number;
-  financialCurrency: string;
+  revenueGrowth?: number;
+  grossMargins?: number;
+  ebitdaMargins?: number;
+  operatingMargins?: number;
+  profitMargins?: number;
+  financialCurrency: string | null;
 }
 
 export interface Ownership {
@@ -462,9 +460,9 @@ export interface FundPerformanceRiskOverviewStatsRow {
 
 export interface FundProfile {
   maxAge: number;
-  styleBoxUrl?: string;
-  family: string;
-  categoryName: string;
+  styleBoxUrl?: null | string;
+  family: null | string;
+  categoryName: null | string;
   legalType: null | string;
   managementInfo: FundProfileManagementInfo;
   feesExpensesInvestment?: FundProfileFeesExpensesInvestment;
@@ -486,7 +484,7 @@ export interface FundProfileManagementInfo {
 
 export interface FundProfileFeesExpensesInvestment {
   annualHoldingsTurnover?: number;
-  annualReportExpenseRatio: number;
+  annualReportExpenseRatio?: number;
   grossExpRatio?: number;
   netExpRatio?: number;
   projectionValues: object;
@@ -511,10 +509,10 @@ export interface IncomeStatementHistoryElement {
   totalRevenue: number;
   costOfRevenue: number;
   grossProfit: number;
-  researchDevelopment: number;
+  researchDevelopment: number | null;
   sellingGeneralAdministrative: number;
-  nonRecurring: DiscontinuedOperations;
-  otherOperatingExpenses: number;
+  nonRecurring: number | null;
+  otherOperatingExpenses: number | null;
   totalOperatingExpenses: number;
   operatingIncome: number;
   totalOtherIncomeExpenseNet: number;
@@ -522,12 +520,12 @@ export interface IncomeStatementHistoryElement {
   interestExpense: number;
   incomeBeforeTax: number;
   incomeTaxExpense: number;
-  minorityInterest: number;
+  minorityInterest: number | null;
   netIncomeFromContinuingOps: number;
-  discontinuedOperations: DiscontinuedOperations;
-  extraordinaryItems: DiscontinuedOperations;
-  effectOfAccountingCharges: DiscontinuedOperations;
-  otherItems: DiscontinuedOperations;
+  discontinuedOperations: number | null;
+  extraordinaryItems: number | null;
+  effectOfAccountingCharges: number | null;
+  otherItems: number | null;
   netIncome: number;
   netIncomeApplicableToCommonShares: number;
 }
@@ -609,12 +607,11 @@ export enum OwnershipEnum {
 
 export interface MajorHoldersBreakdown {
   maxAge: number;
-  insidersPercentHeld: number;
-  institutionsPercentHeld: number;
-  institutionsFloatPercentHeld: number;
-  institutionsCount: number;
+  insidersPercentHeld?: number;
+  institutionsPercentHeld?: number;
+  institutionsFloatPercentHeld?: number;
+  institutionsCount?: number;
 }
-
 export interface NetSharePurchaseActivity {
   maxAge: number;
   period: string;
@@ -626,7 +623,7 @@ export interface NetSharePurchaseActivity {
   sellPercentInsiderShares?: number;
   netInfoCount: number;
   netInfoShares: number;
-  netPercentInsiderShares: number;
+  netPercentInsiderShares?: number;
   totalInsiderShares: number;
 }
 
@@ -652,15 +649,15 @@ export interface Price {
   preMarketPrice?: number;
   preMarketSource?: string;
   priceHint: number;
-  regularMarketChangePercent: number;
-  regularMarketChange: number;
-  regularMarketTime: Date;
-  regularMarketPrice: number;
+  regularMarketChangePercent?: number;
+  regularMarketChange?: number;
+  regularMarketTime?: Date;
+  regularMarketPrice?: number;
   regularMarketDayHigh?: number;
   regularMarketDayLow?: number;
   regularMarketVolume?: number;
-  regularMarketPreviousClose: number;
-  regularMarketSource: string;
+  regularMarketPreviousClose?: number;
+  regularMarketSource?: string;
   regularMarketOpen?: number;
 
   quoteSourceName?: string;
@@ -675,8 +672,8 @@ export interface Price {
   marketState: string;
   marketCap?: number;
 
-  currency: string;
-  currencySymbol: string;
+  currency?: string;
+  currencySymbol?: string;
   fromCurrency: string | null;
   toCurrency: string | null;
 }
@@ -688,7 +685,7 @@ export interface QuoteType {
   underlyingSymbol: string;
   shortName: string;
   longName: null | string;
-  firstTradeDateEpochUtc: number;
+  firstTradeDateEpochUtc: null | Date;
   timeZoneFullName: string;
   timeZoneShortName: string;
   uuid: string;
@@ -753,19 +750,19 @@ export interface SummaryDetail {
   trailingPE?: number;
   forwardPE?: number;
   volume?: number;
-  averageVolume: number;
-  averageVolume10days: number;
-  averageDailyVolume10Day: number;
+  averageVolume?: number;
+  averageVolume10days?: number;
+  averageDailyVolume10Day?: number;
   bid?: number;
   ask?: number;
   bidSize?: number;
   askSize?: number;
   marketCap?: number;
-  fiftyTwoWeekLow: number;
-  fiftyTwoWeekHigh: number;
+  fiftyDayAverage?: number;
+  fiftyTwoWeekLow?: number;
+  fiftyTwoWeekHigh?: number;
+  twoHundredDayAverage?: number;
   priceToSalesTrailing12Months?: number;
-  fiftyDayAverage: number;
-  twoHundredDayAverage: number;
   trailingAnnualDividendRate?: number;
   trailingAnnualDividendYield?: number;
   currency: string;
@@ -867,11 +864,11 @@ export interface UpgradeDowngradeHistory {
 }
 
 export interface UpgradeDowngradeHistoryHistory {
-  epochGradeDate?: Date;
-  firm?: string;
-  toGrade?: Grade;
+  epochGradeDate: Date;
+  firm: string;
+  toGrade: Grade;
   fromGrade?: Grade;
-  action?: Action;
+  action: Action;
 }
 
 export enum Action {
@@ -887,6 +884,7 @@ export enum Grade {
   Buy = "Buy",
   Empty = "",
   EqualWeight = "Equal-Weight",
+  FairValue = "Fair Value",
   GradeEqualWeight = "Equal-weight",
   GradeLongTermBuy = "Long-term Buy",
   Hold = "Hold",
@@ -898,6 +896,7 @@ export enum Grade {
   InLine = "In-Line",
   Outperform = "Outperform",
   Overweight = "Overweight",
+  PeerPerform = "Peer Perform",
   Perform = "Perform",
   Positive = "Positive",
   Reduce = "Reduce",

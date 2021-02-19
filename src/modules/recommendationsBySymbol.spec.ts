@@ -15,8 +15,12 @@ const yf = {
 
 describe("recommendationsBySymbol", () => {
   // make sure it passes validation for some symbols
-  testSymbols.forEach((symbol) => {
-    it(`passes validation for symbol: ${symbol}`, async () => {
+  describe("passes validation", () => {
+    const symbolsToSkip = [
+      "ADH", // 404 Not Found
+    ];
+    const symbols = testSymbols.filter((s) => !symbolsToSkip.includes(s));
+    it.each(symbols)("for symbol '%s'", async (symbol) => {
       const devel = `recommendationsBySymbol-${symbol}.json`;
       await yf.recommendationsBySymbol(symbol, {}, { devel });
     });
